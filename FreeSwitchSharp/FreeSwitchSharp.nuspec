@@ -20,7 +20,7 @@
 		</dependencies>
 	</metadata>
 	<files>
-		<file src="bin\Release\FreeSwitch.*" target="lib" />
+		<file src="bin\Release\FreeSwitchSharp.*" target="lib" />
 		<file src="**\*.cs" target="src" />
 	</files>
 </package>
