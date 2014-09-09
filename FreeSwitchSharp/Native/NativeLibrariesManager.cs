@@ -38,156 +38,157 @@ using SysAssembly = System.Reflection.Assembly;
 
 namespace FreeSwitchSharp.Native
 {
-    public static class NativeLibrariesManager
-    {
-        private static readonly global::Common.Logging.ILog _Log = global::Common.Logging.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private static readonly string _OutputPath = Path.GetDirectoryName(Assembly.GetCallingAssembly().Location);
-        private static readonly object _lock = new object();
-        private static readonly HashSet<INativeLibraryBundle> _bundles = new HashSet<INativeLibraryBundle>();
-        private static bool _done = false;
+	public static class NativeLibrariesManager
+	{
+		private static readonly global::Common.Logging.ILog _Log = global::Common.Logging.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+		private static readonly object _lock = new object();
+		private static readonly HashSet<INativeLibraryBundle> _bundles = new HashSet<INativeLibraryBundle>();
+		private static bool _done = false;
 
-        public static bool RunningIn64Bits { get { return IntPtr.Size == 8; } }
-        public static string RunningOsName { get { return SystemCalls.GetOsName(); } }
+		public static bool RunningIn64Bits { get { return IntPtr.Size == 8; } }
+		public static string RunningOsName { get { return SystemCalls.GetOsName(); } }
 
-        private static byte[] CopyStream(Stream input, Stream output)
-        {
-            var hasher = HashAlgorithm.Create("MD5");
-            var buffer = new byte[0x1000];
-            int read;
+		private static byte[] CopyStream(Stream input, Stream output)
+		{
+			var hasher = HashAlgorithm.Create("MD5");
+			var buffer = new byte[0x1000];
+			int read;
 
-            hasher.Initialize();
-            while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
-            {
-                hasher.TransformBlock(buffer, 0, read, buffer, 0);
-                output.Write(buffer, 0, read);
-            }
-            hasher.TransformFinalBlock(buffer, 0, 0);
+			hasher.Initialize();
+			while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+			{
+				hasher.TransformBlock(buffer, 0, read, buffer, 0);
+				output.Write(buffer, 0, read);
+			}
+			hasher.TransformFinalBlock(buffer, 0, 0);
 
-            return hasher.Hash;
-        }
+			return hasher.Hash;
+		}
 
-        private static bool IsFileLocked(string filePath)
-        {
-            FileStream stream = null;
+		private static bool IsFileLocked(string filePath)
+		{
+			FileStream stream = null;
 
-            try
-            {
-                stream = File.Open(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
-            }
-            catch (IOException)
-            {
-                //the file is unavailable because it is:
-                //still being written to
-                //or being processed by another thread
-                //or does not exist (has already been processed)
-                return true;
-            }
-            finally
-            {
-                if (stream != null)
-                    stream.Close();
-            }
+			try
+			{
+				stream = File.Open(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+			}
+			catch (IOException)
+			{
+				//the file is unavailable because it is:
+				//still being written to
+				//or being processed by another thread
+				//or does not exist (has already been processed)
+				return true;
+			}
+			finally
+			{
+				if (stream != null)
+					stream.Close();
+			}
 
-            //file is not locked
-            return false;
-        }
+			//file is not locked
+			return false;
+		}
 
-        private static void DeployLibrary(Stream stream, string fileName, DateTime timestamp)
-        {
-            var compressed = fileName.EndsWith(".gz", StringComparison.InvariantCultureIgnoreCase);
+		private static void DeployLibrary(Stream stream, string fileName, DateTime timestamp, string where)
+		{
+			var compressed = fileName.EndsWith(".gz", StringComparison.InvariantCultureIgnoreCase);
 
-            fileName = compressed ? Path.GetFileNameWithoutExtension(fileName) : fileName;
-            fileName = Path.Combine(_OutputPath, fileName);
+			fileName = compressed ? Path.GetFileNameWithoutExtension(fileName) : fileName;
+			fileName = Path.Combine(where, fileName);
 
-            if (File.Exists(fileName))
-            {
-                if (File.GetLastWriteTime(fileName) > timestamp)
-                    return;
+			if (File.Exists(fileName))
+			{
+				if (File.GetLastWriteTime(fileName) > timestamp)
+					return;
 
-                if (IsFileLocked(fileName))
-                {
-                    _Log.WarnFormat("Unable to update {0}: file in use!", fileName);
-                    return;
-                }
-            }
+				if (IsFileLocked(fileName))
+				{
+					_Log.WarnFormat("Unable to update {0}: file in use!", fileName);
+					return;
+				}
+			}
 
-            _Log.InfoFormat("Deploying embedded {0} to {1}..", Path.GetFileName(fileName), _OutputPath);
+			_Log.InfoFormat("Deploying embedded {0} to {1}..", Path.GetFileName(fileName), where);
 
-            byte[] hash = null;
+			byte[] hash = null;
 
-            using (var input = compressed ? new GZipStream(stream, CompressionMode.Decompress, false) : stream)
-            using (var output = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None))
-            {
-                hash = CopyStream(input, output);
-            }
+			using (var input = compressed ? new GZipStream(stream, CompressionMode.Decompress, false) : stream)
+			using (var output = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None))
+			{
+				hash = CopyStream(input, output);
+			}
 
-            _Log.InfoFormat("Deployed {0} with md5sum: {1}.", fileName, string.Concat(hash.Select(b => b.ToString("X2")).ToArray()));
+			_Log.InfoFormat("Deployed {0} with md5sum: {1}.", fileName, string.Concat(hash.Select(b => b.ToString("X2")).ToArray()));
 
-            if (Environment.OSVersion.Platform == PlatformID.Unix)
-            {
-                // Set as executable (only applies to mono)..
-                var attrs = File.GetAttributes(fileName);
-                File.SetAttributes(fileName, (FileAttributes)((uint)attrs | 0x80000000));
-            }
-        }
+			if (Environment.OSVersion.Platform == PlatformID.Unix)
+			{
+				// Set as executable (only applies to mono)..
+				var attrs = File.GetAttributes(fileName);
+				File.SetAttributes(fileName, (FileAttributes)((uint)attrs | 0x80000000));
+			}
+		}
 
-        private static void DeployBundlesInternal()
-        {
-            foreach (var bundle in _bundles.Where(x => x.SupportsCurrentPlatform))
-            {
-                _Log.DebugFormat("Attempting to deploy bundle: {0}", bundle);
+		private static void DeployBundlesTo(string where)
+		{
+			foreach (var bundle in _bundles.Where(x => x.SupportsCurrentPlatform))
+			{
+				_Log.DebugFormat("Attempting to deploy bundle: {0}", bundle);
 
-                try
-                {
-                    foreach (var item in bundle.Resources)
-                    {
-                        _Log.DebugFormat("Deploying resource/file: {0}", item.FileName);
+				try
+				{
+					foreach (var item in bundle.Resources)
+					{
+						_Log.DebugFormat("Deploying resource/file: {0}", item.FileName);
 
-                        using (var stream = item.GetResourceStream())
-                        {
-                            DeployLibrary(stream, item.FileName, item.Date);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    var msg = string.Format("Deploying of bundle {0} failed.", bundle.GetType().Name);
-                    throw new ApplicationException(msg, ex);
-                }
-            }
-        }
+						using (var stream = item.GetResourceStream())
+						{
+							DeployLibrary(stream, item.FileName, item.Date, where);
+						}
+					}
+				}
+				catch (Exception ex)
+				{
+					var msg = string.Format("Deploying of bundle {0} failed.", bundle.GetType().Name);
+					throw new ApplicationException(msg, ex);
+				}
+			}
+		}
 
-        public static void Register(INativeLibraryBundle bundle)
-        {
-            if (bundle == null) throw new ArgumentNullException("bundle");
+		public static void Register(INativeLibraryBundle bundle)
+		{
+			if (bundle == null) throw new ArgumentNullException("bundle");
 
-            lock (_lock)
-            {
-                if (_done)
-                {
-                    throw new InvalidOperationException(
-                        "Sorry, native libraries has already been deployed. " +
-                        "Registering a new bundle at this point would make no sense.");
-                }
+			lock (_lock)
+			{
+				if (_done)
+				{
+					throw new InvalidOperationException(
+						"Sorry, native libraries has already been deployed. " +
+						"Registering a new bundle at this point would make no sense.");
+				}
 
-                if (!_bundles.Contains(bundle))
-                {
-                    _Log.DebugFormat("Registering bundle: {0}", bundle);
-                    _bundles.Add(bundle);
-                }
-            }
-        }
+				if (!_bundles.Contains(bundle))
+				{
+					_Log.DebugFormat("Registering bundle: {0}", bundle);
+					_bundles.Add(bundle);
+				}
+			}
+		}
 
-        public static void DeployBundles()
-        {
-            lock (_lock)
-            {
-                if (!_done)
-                {
-                    DeployBundlesInternal();
-                    _done = true;
-                }
-            }
-        }
-    }
+		public static void DeployBundles()
+		{
+			lock (_lock)
+			{
+				if (!_done)
+				{
+					_Log.Info("Deploying native bundles...");
+
+					DeployBundlesTo(Path.GetDirectoryName(Assembly.GetCallingAssembly().Location));
+					_done = true;
+				}
+			}
+		}
+	}
 }
