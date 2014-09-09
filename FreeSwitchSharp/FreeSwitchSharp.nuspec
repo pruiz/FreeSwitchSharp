@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package>
 	<metadata>
-		<id>FreeSwitch</id>
+		<id>FreeSwitchSharp</id>
 		<version>0.0.0.0</version>
 		<authors>pruiz</authors>
 		<owners>pruiz</owners>
