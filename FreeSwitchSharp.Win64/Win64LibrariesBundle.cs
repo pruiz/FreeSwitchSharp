@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 
-namespace FreeSwitchSharp.Win32
+namespace FreeSwitchSharp.Win64
 {
 	using FreeSwitchSharp.Native;
 
