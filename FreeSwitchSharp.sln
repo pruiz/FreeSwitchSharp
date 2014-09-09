@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreeSwitchSharp", "FreeSwitchSharp\FreeSwitchSharp.csproj", "{9B41E620-E27A-4A9F-82B4-EE5E4BC13168}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libs", "Libs", "{18EB4CB4-5782-42FF-9E90-3F7239759C0D}"
+	ProjectSection(SolutionItems) = preProject
+		Libs\ManagedEsl.dll = Libs\ManagedEsl.dll
+		Libs\ManagedEsl.pdb = Libs\ManagedEsl.pdb
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreeSwitchSharp.Win32", "FreeSwitchSharp.Win32\FreeSwitchSharp.Win32.csproj", "{77551704-E1D9-41F3-B374-5A2A83CB91C6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreeSwitchSharp.Win64", "FreeSwitchSharp.Win64\FreeSwitchSharp.Win64.csproj", "{09FD3956-21EA-4CA2-8A9A-AA5791A13CBE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreeSwitchSharp.Linux32", "FreeSwitchSharp.Linux32\FreeSwitchSharp.Linux32.csproj", "{35D6AFFA-D9C4-405A-BDCA-16A88E0143C6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9B41E620-E27A-4A9F-82B4-EE5E4BC13168}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B41E620-E27A-4A9F-82B4-EE5E4BC13168}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B41E620-E27A-4A9F-82B4-EE5E4BC13168}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B41E620-E27A-4A9F-82B4-EE5E4BC13168}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77551704-E1D9-41F3-B374-5A2A83CB91C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77551704-E1D9-41F3-B374-5A2A83CB91C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77551704-E1D9-41F3-B374-5A2A83CB91C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77551704-E1D9-41F3-B374-5A2A83CB91C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09FD3956-21EA-4CA2-8A9A-AA5791A13CBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09FD3956-21EA-4CA2-8A9A-AA5791A13CBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09FD3956-21EA-4CA2-8A9A-AA5791A13CBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09FD3956-21EA-4CA2-8A9A-AA5791A13CBE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35D6AFFA-D9C4-405A-BDCA-16A88E0143C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35D6AFFA-D9C4-405A-BDCA-16A88E0143C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35D6AFFA-D9C4-405A-BDCA-16A88E0143C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35D6AFFA-D9C4-405A-BDCA-16A88E0143C6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

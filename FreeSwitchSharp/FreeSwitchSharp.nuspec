@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package>
+	<metadata>
+		<id>FreeSwitch</id>
+		<version>0.0.0.0</version>
+		<authors>pruiz</authors>
+		<owners>pruiz</owners>
+		<projectUrl>https://github.com/pruiz/FreeSwitchSharp</projectUrl>
+		<licenseUrl>https://www.mozilla.org/MPL/1.1/</licenseUrl>
+		<!-- iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl -->
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<releaseNotes>See changes for this revision at: http://github.com/pruiz/FreeSwitchSharp/commit/GIT_COMMIT </releaseNotes>
+		<description>FreeSwitchSharp's Linux32 Bits natible library bundle.</description>
+		<copyright>Copyright Pablo Ruiz García 2010-2014</copyright>
+		<tags>FreeSwitch FreeSwitchSharp VoIP</tags>
+
+		<dependencies>
+			<dependency id="Common.Logging" version="2.2.0" />
+			<dependency id="Common.Logging.Core" version="2.2.0" />
+		</dependencies>
+	</metadata>
+	<files>
+		<file src="bin\Release\FreeSwitch.*" target="lib" />
+		<file src="**\*.cs" target="src" />
+	</files>
+</package>
