@@ -10,7 +10,7 @@
 		<!-- iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl -->
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<releaseNotes>See changes for this revision at: http://github.com/pruiz/FreeSwitchSharp/commit/GIT_COMMIT </releaseNotes>
-		<description>FreeSwitchSharp's Linux32 Bits natible library bundle.</description>
+		<description>FreeSwitchSharp is a NuGet-based ESL library for .Net using freeswitch's code with a couple of addition/helpers.</description>
 		<copyright>Copyright Pablo Ruiz García 2010-2014</copyright>
 		<tags>FreeSwitch FreeSwitchSharp VoIP</tags>
 
